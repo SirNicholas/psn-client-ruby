@@ -52,7 +52,7 @@ Every object exposes `#raw` with the untouched API response.
 ```ruby
 # Games played (any account whose privacy settings allow it)
 client.games.played.first(10).each { |g| puts "#{g.name} [#{g.platform}]" }
-client.games.played("a_friend").to_a
+client.games.played(online_id: "a_friend").to_a
 
 # Game library and purchases (authenticated account only, GraphQL)
 client.games.library.to_a                 # owned + subscription titles
