@@ -24,8 +24,8 @@ RSpec.describe PSN::Resources::Games do
       .with(:mobile, "/api/gamelist/v2/users/42/titles", { "limit" => 200, "offset" => 0 })
       .and_return({ "titles" => Array.new(200) { fixture("game_title") }, "totalItemCount" => 400 })
 
-    expect(games.played("friend")).to be_a(PSN::Collection)
-    expect(games.played("friend").first(3).size).to eq(3)
+    expect(games.played(online_id: "friend")).to be_a(PSN::Collection)
+    expect(games.played(online_id: "friend").first(3).size).to eq(3)
     expect(connection).to have_received(:get).once # second page never requested
   end
 

@@ -39,10 +39,10 @@ module PSN
       end
 
       # Every title the account has played, most recent first.
-      def played(online_id = nil)
-        account_id = @users.account_id(online_id)
+      def played(online_id: nil, account_id: nil)
+        acc_id = account_id || @users.account_id(online_id)
         paginator = Paginator.offset(page_size: PAGE_SIZE) do |limit, offset|
-          response = @connection.get(:mobile, format(TITLES_PATH, account_id),
+          response = @connection.get(:mobile, format(TITLES_PATH, acc_id),
                                      { "limit" => limit, "offset" => offset })
           [response["titles"] || [], response["totalItemCount"]]
         end
