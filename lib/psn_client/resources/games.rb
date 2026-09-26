@@ -39,12 +39,23 @@ module PSN
       end
 
       # Every title the account has played, most recent first.
-      def played(online_id: nil, account_id: nil)
+      def played(online_id: nil, account_id: nil, last_checked_date_time: nil, page_size: PAGE_SIZE)
         acc_id = account_id || @users.account_id(online_id)
-        paginator = Paginator.offset(page_size: PAGE_SIZE) do |limit, offset|
+        paginator = Paginator.offset(page_size: page_size) do |limit, offset|
           response = @connection.get(:mobile, format(TITLES_PATH, acc_id),
                                      { "limit" => limit, "offset" => offset })
-          [response["titles"] || [], response["totalItemCount"]]
+          titles = response["titles"] || []
+          if last_checked_date_time
+            freshly_played_games =
+              titles.select { |t| Mapping.time(t["lastPlayedDateTime"]) > last_checked_date_time }
+            if freshly_played_games.count != titles.count
+              [freshly_played_games, freshly_played_games.count]
+            else
+              [titles, response["totalItemCount"]]
+            end
+          else
+            [titles, response["totalItemCount"]]
+          end
         end
         paginator.map { |title| GameTitle.from_api(title) }
       end
