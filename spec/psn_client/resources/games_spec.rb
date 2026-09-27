@@ -10,12 +10,25 @@ RSpec.describe PSN::Resources::Games do
     allow(users).to receive(:account_id).with(nil).and_return("me")
     allow(connection).to receive(:get)
       .with(:mobile, "/api/gamelist/v2/users/me/titles", { "limit" => 200, "offset" => 0 })
-      .and_return({ "titles" => [fixture("game_title")], "totalItemCount" => 1 })
+      .and_return({ "titles" => fixture("games_list"), "totalItemCount" => 2 })
 
     result = games.played.to_a
-    expect(result.size).to eq(1)
+    expect(result.size).to eq(2)
     expect(result.first).to be_a(PSN::GameTitle)
     expect(result.first.name).to eq("ASTRO's PLAYROOM")
+    expect(result.last.name).to eq("God of War")
+  end
+
+  it "fetches the pages of played titles until last_checked_date_time" do
+    allow(users).to receive(:account_id).with(nil).and_return("me")
+    allow(connection).to receive(:get)
+      .with(:mobile, "/api/gamelist/v2/users/me/titles", { "limit" => 10, "offset" => 0 })
+      .and_return({ "titles" => fixture("games_list"), "totalItemCount" => 1 })
+
+    result = games.played(last_checked_date_time: Date.parse("2026-09-07").to_time, page_size: 10).to_a
+    expect(result.size).to eq(1)
+    expect(result.first).to be_a(PSN::GameTitle)
+    expect(result.first.name).to eq("God of War")
   end
 
   it "resolves another user's online ID and pages lazily" do

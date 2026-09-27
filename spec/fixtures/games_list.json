@@ -1,0 +1,24 @@
+[
+  {
+    "titleId": "PPSA01325_00",
+    "name": "ASTRO's PLAYROOM",
+    "localizedName": "ASTRO's PLAYROOM",
+    "imageUrl": "https://image.api.playstation.com/x.png",
+    "category": "ps5_native_game",
+    "playCount": 12,
+    "firstPlayedDateTime": "2024-12-25T10:00:00Z",
+    "lastPlayedDateTime": "2026-08-01T18:30:00Z",
+    "playDuration": "PT15H2M32S"
+  },
+  {
+    "titleId": "PPSA013123_00",
+    "name": "God of War",
+    "localizedName": "God of War",
+    "imageUrl": "https://image.api.playstation.com/x.png",
+    "category": "ps5_native_game",
+    "playCount": 12,
+    "firstPlayedDateTime": "2024-12-25T10:00:00Z",
+    "lastPlayedDateTime": "2026-09-10T18:30:00Z",
+    "playDuration": "PT15H2M32S"
+  }
+]
