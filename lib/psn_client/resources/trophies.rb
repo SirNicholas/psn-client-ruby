@@ -67,11 +67,11 @@ module PSN
 
       # Trophy groups for one title (base game is "default", DLC packs are
       # "001", "002", ...), each merged with the account's progress.
-      def groups(online_id = nil, np_communication_id:, platform: nil)
-        account_id = @users.account_id(online_id)
+      def groups(online_id: nil, account_id: nil, np_communication_id:, platform: nil)
+        acc_id = account_id || @users.account_id(online_id)
         params = service_params(platform)
         definitions = @connection.get(:mobile, format(GROUPS_DEFINITIONS_PATH, np_communication_id), params)
-        earned = @connection.get(:mobile, format(GROUPS_EARNED_PATH, account_id, np_communication_id), params)
+        earned = @connection.get(:mobile, format(GROUPS_EARNED_PATH, acc_id, np_communication_id), params)
         merge_groups(definitions["trophyGroups"] || [], earned["trophyGroups"] || []).lazy
       end
 
