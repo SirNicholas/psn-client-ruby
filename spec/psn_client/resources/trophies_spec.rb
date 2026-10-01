@@ -95,7 +95,7 @@ RSpec.describe PSN::Resources::Trophies do
               { "npTitleIds" => "A_00,B_00,C_00,D_00,E_00" })
         .and_return({ "titles" => [fixture("title_trophy_summary")] })
 
-      result = trophies.title_summary("friend", title_ids: %w[A_00 B_00 C_00 D_00 E_00 F_00])
+      result = trophies.title_summary(online_id: "friend", title_ids: %w[A_00 B_00 C_00 D_00 E_00 F_00])
       expect(result.first(1).size).to eq(1)
       expect(connection).to have_received(:get).once # second batch never requested
     end

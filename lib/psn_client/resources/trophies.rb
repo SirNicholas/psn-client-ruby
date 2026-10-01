@@ -47,10 +47,10 @@ module PSN
 
       # Trophy progress for specific title IDs (CUSA/PPSA...). The API caps
       # each request at 5 IDs, so larger lists are fetched in lazy batches.
-      def title_summary(online_id = nil, title_ids:)
-        account_id = @users.account_id(online_id)
+      def title_summary(online_id: nil, account_id: nil, title_ids:)
+        acc_id = account_id || @users.account_id(online_id)
         title_ids.each_slice(TITLE_IDS_PER_REQUEST).lazy.flat_map do |batch|
-          response = @connection.get(:mobile, format(TITLE_SUMMARY_PATH, account_id),
+          response = @connection.get(:mobile, format(TITLE_SUMMARY_PATH, acc_id),
                                      { "npTitleIds" => batch.join(",") })
           (response["titles"] || []).map { |title| TitleTrophySummary.from_api(title) }
         end
