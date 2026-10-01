@@ -57,11 +57,11 @@ module PSN
       end
 
       # All trophies for one title, each merged with the user's earned status.
-      def earned(online_id = nil, np_communication_id:, platform: nil)
-        account_id = @users.account_id(online_id)
+      def earned(online_id: nil, account_id: nil, np_communication_id:, platform: nil)
+        acc_id = account_id || @users.account_id(online_id)
         params = service_params(platform)
         definitions = @connection.get(:mobile, format(DEFINITIONS_PATH, np_communication_id), params)
-        earned = @connection.get(:mobile, format(EARNED_PATH, account_id, np_communication_id), params)
+        earned = @connection.get(:mobile, format(EARNED_PATH, acc_id, np_communication_id), params)
         merge(definitions["trophies"] || [], earned["trophies"] || []).lazy
       end
 
