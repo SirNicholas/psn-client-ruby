@@ -9,8 +9,11 @@ module PSN
   # and transparently refreshes the ~1h access token. Tokens are never
   # persisted; read #refresh_token and store it yourself for the next session,
   # or pass on_token_refresh: to be handed every new refresh token (the
-  # initial exchange included) as it happens. If the callback raises, the event
-  # is not re-delivered — rescue and recover via #refresh_token.
+  # initial exchange included) as it happens. A two-argument callback also
+  # receives the new access token's expiry (a Time, already EXPIRY_BUFFER
+  # early); a one-argument callback gets just the token. If the callback
+  # raises, the event is not re-delivered — rescue and recover via
+  # #refresh_token.
   class Auth
     AUTH_BASE = "https://ca.account.sony.com/api/authz/v3/oauth"
     CLIENT_ID = "09515159-7237-4370-9b40-3806e67c0891"
@@ -19,7 +22,7 @@ module PSN
     SCOPE = "psn:mobile.v2.core psn:clientapp"
     EXPIRY_BUFFER = 60 # seconds; refresh slightly early to absorb clock skew
 
-    attr_reader :refresh_token
+    attr_reader :refresh_token, :expires_at
 
     def initialize(npsso: nil, refresh_token: nil, on_token_refresh: nil)
       unless [npsso, refresh_token].compact.size == 1
@@ -57,17 +60,26 @@ module PSN
     # Rotations are detected exactly once and in order under the mutex, but
     # because delivery happens outside it, concurrent rotations may deliver
     # out of order — the token argument, not #refresh_token, is the
-    # authoritative value for the event.
+    # authoritative value for the event (the expiry is captured alongside it
+    # for the same reason).
     def notifying_rotation
-      rotated = nil
+      rotation = nil
       result = @mutex.synchronize do
         before = @refresh_token
         value = yield
-        rotated = @refresh_token unless @refresh_token == before
+        rotation = [@refresh_token, @expires_at] unless @refresh_token == before
         value
       end
-      @on_token_refresh&.call(rotated) if rotated
+      deliver_rotation(*rotation) if rotation && @on_token_refresh
       result
+    end
+
+    # One-argument callbacks predate the expiry argument; a lambda or Method
+    # with arity 1 would raise ArgumentError if handed two, so keep calling
+    # those with the token alone.
+    def deliver_rotation(token, expires_at)
+      callback = @on_token_refresh
+      callback.respond_to?(:arity) && callback.arity == 1 ? callback.call(token) : callback.call(token, expires_at)
     end
 
     def expired?

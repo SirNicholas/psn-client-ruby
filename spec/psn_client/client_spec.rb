@@ -62,6 +62,17 @@ RSpec.describe PSN::Client do
     expect(client.refresh_token).to eq("RT-1")
   end
 
+  it "exposes the access token expiry once authenticated" do
+    now = Time.at(1_700_000_000)
+    allow(Time).to receive(:now).and_return(now)
+    stub_oauth
+
+    client = described_class.new(refresh_token: "RT-0")
+    expect(client.access_token_expires_at).to be_nil
+    client.access_token
+    expect(client.access_token_expires_at).to eq(now + 3540)
+  end
+
   it "sends the configured language on API requests" do
     stub_oauth
     stub_request(:get, "https://m.np.playstation.com/api/gamelist/v2/users/me/titles")

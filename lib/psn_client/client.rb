@@ -13,8 +13,10 @@ module PSN
   # in some responses follow it).
   # on_token_refresh: is called with each new refresh token — persist it there
   # instead of polling #refresh_token, since Connection can rotate the token
-  # mid-session when it recovers from a 401. Persist the token argument itself;
-  # delivery order is unspecified if two threads rotate concurrently. If the
+  # mid-session when it recovers from a 401. A two-argument callback also gets
+  # the new access token's expiry (see #access_token_expires_at). Persist the
+  # token argument itself; delivery order is unspecified if two threads rotate
+  # concurrently. If the
   # callback raises, the event is not re-delivered — rescue and recover via
   # #refresh_token.
   class Client
@@ -40,6 +42,10 @@ module PSN
 
     # Persist this (it rotates) to reconstruct the client without a fresh NPSSO.
     def refresh_token = @auth.refresh_token
+
+    # When the current access token is treated as expired (nil before the
+    # first authentication). This is the ~1h access token, not the refresh token.
+    def access_token_expires_at = @auth.expires_at
 
     private
 
