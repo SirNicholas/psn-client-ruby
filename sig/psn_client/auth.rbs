@@ -7,15 +7,21 @@ module PSN
     SCOPE: String
     EXPIRY_BUFFER: Integer
 
-    attr_reader refresh_token: String?
+    # Called with each new refresh token; two-argument callbacks also get the
+    # new access token's expiry.
+    type token_refresh_callback = ^(String) -> void | ^(String, Time) -> void
 
-    def initialize: (?npsso: String?, ?refresh_token: String?, ?on_token_refresh: (^(String) -> void)?) -> void
+    attr_reader refresh_token: String?
+    attr_reader expires_at: Time?
+
+    def initialize: (?npsso: String?, ?refresh_token: String?, ?on_token_refresh: token_refresh_callback?) -> void
     def access_token: () -> String
     def refresh!: () -> String
 
     private
 
     def notifying_rotation: [T] () { () -> T } -> T
+    def deliver_rotation: (String token, Time expires_at) -> void
     def expired?: () -> boolish
     def authenticate: () -> String
     def refresh: () -> String

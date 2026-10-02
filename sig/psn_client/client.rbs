@@ -1,7 +1,7 @@
 module PSN
   class Client
     def initialize: (?npsso: String?, ?refresh_token: String?, ?language: String,
-                     ?on_token_refresh: (^(String) -> void)?) -> void
+                     ?on_token_refresh: Auth::token_refresh_callback?) -> void
     def games: () -> Resources::Games
     def trophies: () -> Resources::Trophies
     def store: () -> Resources::Store
@@ -15,6 +15,7 @@ module PSN
     def browse: () -> Resources::Browse
     def access_token: () -> String
     def refresh_token: () -> String?
+    def access_token_expires_at: () -> Time?
 
     private
 

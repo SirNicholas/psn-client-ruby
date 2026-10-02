@@ -31,11 +31,15 @@ client = PSN::Client.new(refresh_token: saved_token)
 # language: is sent as Accept-Language on every request (default "en-US").
 # on_token_refresh: is a push-based alternative to polling client.refresh_token —
 # it's called with each new refresh token as it rotates, initial exchange included.
+# A two-argument callback also receives the new access token's expiry (a Time);
+# one-argument callbacks like ->(token) { ... } keep working.
 client = PSN::Client.new(
   refresh_token: saved_token,
   language: "en-GB",
-  on_token_refresh: ->(token) { TokenStore.save(token) }
+  on_token_refresh: ->(token, access_expires_at) { TokenStore.save(token, access_expires_at) }
 )
+
+client.access_token_expires_at # current access token's expiry (nil until first auth)
 
 client.games.played.total  # server-reported count, without fetching every page
 ```
