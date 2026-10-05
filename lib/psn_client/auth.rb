@@ -19,7 +19,7 @@ module PSN
     SCOPE = "psn:mobile.v2.core psn:clientapp"
     EXPIRY_BUFFER = 60 # seconds; refresh slightly early to absorb clock skew
 
-    attr_reader :refresh_token
+    attr_reader :refresh_token, :expires_at
 
     def initialize(npsso: nil, refresh_token: nil, on_token_refresh: nil)
       unless [npsso, refresh_token].compact.size == 1

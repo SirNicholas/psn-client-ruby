@@ -38,6 +38,8 @@ module PSN
     # Triggers authentication if it has not happened yet.
     def access_token = @auth.access_token
 
+    def access_token_expires_at = @auth.expires_at
+
     # Persist this (it rotates) to reconstruct the client without a fresh NPSSO.
     def refresh_token = @auth.refresh_token
 
