@@ -21,7 +21,7 @@ module PSN
 
     attr_reader :refresh_token, :expires_at
 
-    def initialize(npsso: nil, refresh_token: nil, on_token_refresh: nil)
+    def initialize(npsso: nil, refresh_token: nil, access_token_params: {}, on_token_refresh: nil)
       unless [npsso, refresh_token].compact.size == 1
         raise ArgumentError, "provide exactly one of npsso: or refresh_token:"
       end
@@ -29,8 +29,13 @@ module PSN
       @npsso = npsso
       @refresh_token = refresh_token
       @on_token_refresh = on_token_refresh
-      @access_token = nil
-      @expires_at = nil
+      if access_token_params[:access_token] && access_token_params[:expires_at]
+        @access_token = access_token_params[:access_token]
+        @expires_at = access_token_params[:expires_at]
+      else
+        @access_token = nil
+        @expires_at = nil
+      end
       @mutex = Mutex.new
     end
 

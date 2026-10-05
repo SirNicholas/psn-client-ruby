@@ -18,8 +18,8 @@ module PSN
   # callback raises, the event is not re-delivered — rescue and recover via
   # #refresh_token.
   class Client
-    def initialize(npsso: nil, refresh_token: nil, language: Connection::DEFAULT_LANGUAGE, on_token_refresh: nil)
-      @auth = Auth.new(npsso: npsso, refresh_token: refresh_token, on_token_refresh: on_token_refresh)
+    def initialize(npsso: nil, refresh_token: nil, access_token_params: {}, language: Connection::DEFAULT_LANGUAGE, on_token_refresh: nil)
+      @auth = Auth.new(npsso: npsso, refresh_token: refresh_token, access_token_params: access_token_params, on_token_refresh: on_token_refresh)
       @connection = Connection.new(@auth, language: language)
     end
 
